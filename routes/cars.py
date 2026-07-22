@@ -7,6 +7,11 @@ from models import Car, User
 cars_bp = Blueprint("cars", __name__, url_prefix="/cars")
 
 REQUIRED_FIELDS = ["make", "model", "year", "price", "mileage"]
+OPTIONAL_FIELDS = [
+    "image_url", "fuel_type", "transmission", "horsepower", "engine",
+    "drivetrain", "seats", "zero_to_hundred", "weight_kg",
+    "fuel_consumption", "description",
+]
 
 
 @cars_bp.get("")
@@ -42,8 +47,8 @@ def create_car():
         year=data["year"],
         price=data["price"],
         mileage=data["mileage"],
-        image_url=data.get("image_url"),
         seller_id=seller_id,
+        **{f: data.get(f) for f in OPTIONAL_FIELDS},
     )
     db.session.add(car)
     db.session.commit()
@@ -65,11 +70,9 @@ def update_car(car_id):
             return jsonify({"error": "You can only edit your own listings"}), 403
 
     data = request.get_json() or {}
-    for field in REQUIRED_FIELDS:
+    for field in REQUIRED_FIELDS + OPTIONAL_FIELDS:
         if field in data:
             setattr(car, field, data[field])
-    if "image_url" in data:
-        car.image_url = data["image_url"]
 
     db.session.commit()
     return jsonify(car.to_dict()), 200
