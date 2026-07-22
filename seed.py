@@ -1,11 +1,3 @@
-"""
-Seed the database with a demo seller account and sample car listings.
-
-Usage:
-    python seed.py
-
-Safe to run more than once — skips seeding if cars already exist.
-"""
 from app import create_app
 from extensions import db
 from models import User, Car
