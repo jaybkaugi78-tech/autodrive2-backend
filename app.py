@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from routes.contact import contact_bp
 
 from config import Config
 from extensions import db, jwt
@@ -21,6 +22,7 @@ def create_app():
     app.register_blueprint(cars_bp)
     app.register_blueprint(favorites_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(contact_bp)
 
     @app.get("/")
     def health():

@@ -130,3 +130,13 @@ class Favorite(db.Model):
 
     def to_dict(self):
         return {"id": self.id, "user_id": self.user_id, "car_id": self.car_id}
+
+class ContactMessage(db.Model):
+    """A message sent via the public Contact Us page."""
+    __tablename__ = "contact_messages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(150), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

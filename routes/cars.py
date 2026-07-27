@@ -1,23 +1,21 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from marshmallow import ValidationError
 
 from extensions import db
 from models import Car, User
+from schemas import CarSchema
 
 cars_bp = Blueprint("cars", __name__, url_prefix="/cars")
 
-REQUIRED_FIELDS = ["make", "model", "year", "price", "mileage"]
-OPTIONAL_FIELDS = [
-    "image_url", "fuel_type", "transmission", "horsepower", "engine",
-    "drivetrain", "seats", "zero_to_hundred", "weight_kg",
-    "fuel_consumption", "description",
-]
+car_schema = CarSchema()
+cars_schema = CarSchema(many=True)
 
 
 @cars_bp.get("")
 def list_cars():
     cars = Car.query.order_by(Car.id.desc()).all()
-    return jsonify([c.to_dict() for c in cars]), 200
+    return jsonify(cars_schema.dump(cars)), 200
 
 
 @cars_bp.get("/<int:car_id>")
@@ -25,7 +23,7 @@ def get_car(car_id):
     car = Car.query.get(car_id)
     if not car:
         return jsonify({"error": "Car not found"}), 404
-    return jsonify(car.to_dict()), 200
+    return jsonify(car_schema.dump(car)), 200
 
 
 @cars_bp.post("")
@@ -36,23 +34,15 @@ def create_car():
     if not user or user.role not in ("seller", "admin"):
         return jsonify({"error": "Only seller accounts can post listings"}), 403
 
-    data = request.get_json() or {}
-    missing = [f for f in REQUIRED_FIELDS if data.get(f) in (None, "")]
-    if missing:
-        return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+    try:
+        data = car_schema.load(request.get_json() or {})
+    except ValidationError as err:
+        return jsonify({"error": err.messages}), 400
 
-    car = Car(
-        make=data["make"],
-        model=data["model"],
-        year=data["year"],
-        price=data["price"],
-        mileage=data["mileage"],
-        seller_id=seller_id,
-        **{f: data.get(f) for f in OPTIONAL_FIELDS},
-    )
+    car = Car(seller_id=seller_id, **data)
     db.session.add(car)
     db.session.commit()
-    return jsonify(car.to_dict()), 201
+    return jsonify(car_schema.dump(car)), 201
 
 
 @cars_bp.put("/<int:car_id>")
@@ -64,18 +54,21 @@ def update_car(car_id):
 
     current_user_id = int(get_jwt_identity())
     if car.seller_id != current_user_id:
-        from models import User
         user = User.query.get(current_user_id)
         if not user or user.role != "admin":
             return jsonify({"error": "You can only edit your own listings"}), 403
 
-    data = request.get_json() or {}
-    for field in REQUIRED_FIELDS + OPTIONAL_FIELDS:
-        if field in data:
-            setattr(car, field, data[field])
+    try:
+        # partial=True: updates don't need to resend every required field
+        data = car_schema.load(request.get_json() or {}, partial=True)
+    except ValidationError as err:
+        return jsonify({"error": err.messages}), 400
+
+    for field, value in data.items():
+        setattr(car, field, value)
 
     db.session.commit()
-    return jsonify(car.to_dict()), 200
+    return jsonify(car_schema.dump(car)), 200
 
 
 @cars_bp.delete("/<int:car_id>")

@@ -1,17 +1,22 @@
 from flask import Blueprint, jsonify
 
 from extensions import db
-from models import User, Car
+from models import User, Car, ContactMessage
 from utils import admin_required
+from schemas import UserSchema, CarSchema, ContactMessageSchema
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+users_schema = UserSchema(many=True)
+car_schema = CarSchema()
+contact_messages_schema = ContactMessageSchema(many=True)
 
 
 @admin_bp.get("/users")
 @admin_required
 def list_users():
     users = User.query.order_by(User.id).all()
-    return jsonify([u.to_dict() for u in users]), 200
+    return jsonify(users_schema.dump(users)), 200
 
 
 @admin_bp.delete("/users/<int:user_id>")
@@ -38,3 +43,22 @@ def admin_delete_car(car_id):
     db.session.delete(car)
     db.session.commit()
     return jsonify({"message": "Car deleted"}), 200
+
+@admin_bp.get("/messages")
+@admin_required
+def list_messages():
+    """Admin-only inbox for messages submitted via the public Contact Us page."""
+    messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
+    return jsonify(messages_schema.dump(messages)), 200
+
+
+@admin_bp.delete("/messages/<int:message_id>")
+@admin_required
+def delete_message(message_id):
+    msg = ContactMessage.query.get(message_id)
+    if not msg:
+        return jsonify({"error": "Message not found"}), 404
+
+    db.session.delete(msg)
+    db.session.commit()
+    return jsonify({"message": "Message deleted"}), 200

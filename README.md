@@ -15,6 +15,18 @@ python app.py
 Runs on `http://localhost:5000`. The `car_marketplace.db` SQLite file and
 all tables are created automatically on first run.
 
+## Seed sample data
+
+Want the browse page to have something in it right away instead of
+starting empty? Run:
+
+```bash
+python seed.py
+```
+
+This creates a demo seller account and 9 sample cars. Safe to run more
+than once — it skips seeding if any cars already exist.
+
 ## Endpoints
 
 | Method | Route | Protected | Description |
@@ -61,6 +73,11 @@ Relationships: `User → Car` and `Car → Listing` (one-to-many),
 
 ## Notes
 
+- Request validation and response serialization use **Marshmallow**
+  (`schemas.py`) — every POST/PUT is validated against a schema before
+  touching the database, and every response is built with `schema.dump()`
+  instead of manual dict-building. Invalid input returns `400` with a
+  structured `{"error": {"field": ["reason"]}}` body.
 - Password reset tokens are time-limited (30 min) and signed with `itsdangerous`.
   `POST /auth/reset-password` returns the token directly in the response for
   local testing — in a real deployment this would be emailed instead.
