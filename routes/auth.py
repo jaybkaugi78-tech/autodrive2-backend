@@ -51,13 +51,6 @@ def login():
 
 @auth_bp.post("/reset-password")
 def request_reset():
-    """Step 1: request a reset token for an email.
-
-    Always returns 200 with a generic message, even if the email doesn't
-    exist, so the endpoint can't be used to find out who has an account.
-    In production this token would be emailed, not returned in the JSON —
-    it's returned here only so the flow is testable without an email server.
-    """
     try:
         data = reset_request_schema.load(request.get_json() or {})
     except ValidationError as err:

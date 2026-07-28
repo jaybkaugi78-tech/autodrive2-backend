@@ -61,15 +61,15 @@ class Car(db.Model):
     mileage = db.Column(db.Integer, nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
 
-    fuel_type = db.Column(db.String(30), nullable=True)        # Petrol / Diesel / Hybrid / Electric
-    transmission = db.Column(db.String(30), nullable=True)     # Automatic / Manual
+    fuel_type = db.Column(db.String(30), nullable=True)       
+    transmission = db.Column(db.String(30), nullable=True)    
     horsepower = db.Column(db.Integer, nullable=True)
-    engine = db.Column(db.String(100), nullable=True)          # e.g. "3.0L Twin-Turbo Inline-6"
-    drivetrain = db.Column(db.String(20), nullable=True)       # AWD / RWD / FWD
+    engine = db.Column(db.String(100), nullable=True)          
+    drivetrain = db.Column(db.String(20), nullable=True)       
     seats = db.Column(db.Integer, nullable=True)
-    zero_to_hundred = db.Column(db.Float, nullable=True)       # seconds
+    zero_to_hundred = db.Column(db.Float, nullable=True)      
     weight_kg = db.Column(db.Integer, nullable=True)
-    fuel_consumption = db.Column(db.String(30), nullable=True) # e.g. "9.6L/100km"
+    fuel_consumption = db.Column(db.String(30), nullable=True) 
     description = db.Column(db.Text, nullable=True)
 
     seller_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -106,7 +106,7 @@ class Listing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
     description = db.Column(db.Text, nullable=False, default="")
-    status = db.Column(db.String(20), default="active")  # active / sold / pending
+    status = db.Column(db.String(20), default="active") 
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -132,7 +132,6 @@ class Favorite(db.Model):
         return {"id": self.id, "user_id": self.user_id, "car_id": self.car_id}
 
 class ContactMessage(db.Model):
-    """A message sent via the public Contact Us page."""
     __tablename__ = "contact_messages"
 
     id = db.Column(db.Integer, primary_key=True)

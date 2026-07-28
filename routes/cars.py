@@ -59,7 +59,6 @@ def update_car(car_id):
             return jsonify({"error": "You can only edit your own listings"}), 403
 
     try:
-        # partial=True: updates don't need to resend every required field
         data = car_schema.load(request.get_json() or {}, partial=True)
     except ValidationError as err:
         return jsonify({"error": err.messages}), 400

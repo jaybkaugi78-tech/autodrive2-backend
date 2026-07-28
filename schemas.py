@@ -1,14 +1,4 @@
-"""
-Marshmallow schemas.
-
-Each schema does two jobs:
-  - load(data)  -> validates and deserializes incoming JSON, raising
-                   ValidationError (caught in the routes) on bad input
-  - dump(obj)   -> serializes a model instance into a JSON-safe dict
-                   for the response, replacing manual to_dict() calls
-"""
-from marshmallow import Schema, fields, validate, ValidationError  # noqa: F401 (re-exported for routes)
-
+from marshmallow import Schema, fields, validate, ValidationError  
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -39,7 +29,7 @@ class ResetConfirmSchema(Schema):
 
 
 class CarSchema(Schema):
-    """Full output shape for a car — used for dump() on responses."""
+   
 
     id = fields.Int(dump_only=True)
     make = fields.Str(required=True, validate=validate.Length(min=1, max=50))

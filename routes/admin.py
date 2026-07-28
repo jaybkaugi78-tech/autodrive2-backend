@@ -28,7 +28,7 @@ def delete_user(user_id):
     if user.role == "admin":
         return jsonify({"error": "Cannot delete another admin account"}), 400
 
-    db.session.delete(user)  # cascades to their cars and favorites
+    db.session.delete(user)  
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200
 
@@ -47,7 +47,6 @@ def admin_delete_car(car_id):
 @admin_bp.get("/messages")
 @admin_required
 def list_messages():
-    """Admin-only inbox for messages submitted via the public Contact Us page."""
     messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
     return jsonify(messages_schema.dump(messages)), 200
 

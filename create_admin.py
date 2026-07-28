@@ -1,12 +1,3 @@
-"""
-Create an admin account, or promote an existing user to admin.
-
-Usage:
-    python create_admin.py admin@example.com "Admin Name" somepassword
-
-If the email already exists, that account is promoted to admin
-(password left unchanged). Otherwise a new admin account is created.
-"""
 import sys
 from app import create_app
 from extensions import db
