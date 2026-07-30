@@ -77,3 +77,25 @@ class ContactMessageSchema(Schema):
     email = fields.Email(dump_only=True)
     message = fields.Str(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
+
+
+class CarSummarySchema(Schema):
+    id = fields.Int(dump_only=True)
+    make = fields.Str(dump_only=True)
+    model = fields.Str(dump_only=True)
+    year = fields.Int(dump_only=True)
+
+
+class CarMessageCreateSchema(Schema):
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    email = fields.Email(required=True)
+    message = fields.Str(required=True, validate=validate.Length(min=1, max=2000))
+
+
+class CarMessageSchema(Schema):
+    id = fields.Int(dump_only=True)
+    car = fields.Nested(CarSummarySchema, dump_only=True)
+    buyer_name = fields.Str(dump_only=True)
+    buyer_email = fields.Email(dump_only=True)
+    message = fields.Str(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)

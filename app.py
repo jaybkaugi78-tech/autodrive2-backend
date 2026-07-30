@@ -8,7 +8,7 @@ from routes.auth import auth_bp
 from routes.cars import cars_bp
 from routes.favorites import favorites_bp
 from routes.admin import admin_bp
-
+from routes.messages import messages_bp
 
 def create_app():
     app = Flask(__name__)
@@ -23,7 +23,7 @@ def create_app():
     app.register_blueprint(favorites_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(contact_bp)
-
+    app.register_blueprint(messages_bp)
     @app.get("/")
     def health():
         return jsonify({"status": "ok", "service": "car-marketplace-api"}), 200

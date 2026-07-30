@@ -139,3 +139,17 @@ class ContactMessage(db.Model):
     email = db.Column(db.String(150), nullable=False)
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+ 
+
+class CarMessage(db.Model):
+    __tablename__ = "car_messages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    buyer_name = db.Column(db.String(100), nullable=False)
+    buyer_email = db.Column(db.String(150), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    car = db.relationship("Car")
